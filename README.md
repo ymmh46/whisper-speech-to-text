@@ -1,6 +1,6 @@
 # whisper-speech-to-text
 
-使用 openAI WHisper Model 進行批次語音辨識，預設語言是繁體中文。
+使用 OpenAI Whisper Model 進行批次語音辨識，預設語言是繁體中文。
 
 ## How to use? 使用說明
 
