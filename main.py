@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 # take environment variables from .env.
 load_dotenv()
 
-
 # Setup openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -21,25 +20,44 @@ output_path = r"./output"
 
 # * Loop Whisper Model
 
+
 for file in os.listdir(input_path):
+
+    # Setting input file
     input_file_path = input_path + "/" + file
     input_file = open(input_file_path, "rb")
     file_name = file.split(".")[0]
+    print(f'Processing: {file_name}')
 
-    print(f'Processing: {file_name} ...')
+    # OpenAI Whisper Model Processing with error handling
+    try:
+        transcript = openai.Audio.transcribe(
+            file=input_file, model="whisper-1", response_format="text", language="zh"
+        )
+        input_file.close()
 
-    transcript = openai.Audio.transcribe(
-        file=input_file, model="whisper-1", response_format="text", language="zh"
-    )
-    input_file.close()
+        # Output file if success
+        output_file_path = output_path + "/" + file_name + ".txt"
+        output_file = open(output_file_path, "wt")
+        output_file.write(transcript)
+        output_file.close()
 
-    output_file_path = output_path + "/" + file_name + ".txt"
-    output_file = open(output_file_path, "wt")
-    output_file.write(transcript)
-    output_file.close()
+        print(f'Successfully transcribed: {file_name}\n')
 
-    print(f'Successfully transcribed: {file_name} !')
+    except openai.error.APIError as e:
+        #Handle API error here, e.g. retry or log
+        print(f"OpenAI API returned an API Error: {e}\n")
+        pass
 
-# output_file.write(transcript)
-# output_file.close()
-# audio_file.close()
+    except openai.error.APIConnectionError as e:
+        #Handle connection error here
+        print(f"Failed to connect to OpenAI API: {e}\n")
+        pass
+
+    except openai.error.RateLimitError as e:
+        #Handle rate limit error (we recommend using exponential backoff)
+        print(f"OpenAI API request exceeded rate limit: {e}\n")
+        pass
+    except:
+        file_type = "." + file.split(".")[1]
+        print(f"Error: Unsupported file type: {file_type}\n")
