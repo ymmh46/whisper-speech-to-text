@@ -26,6 +26,8 @@ for file in os.listdir(input_path):
     input_file = open(input_file_path, "rb")
     file_name = file.split(".")[0]
 
+    print(f'Processing: {file_name} ...')
+
     transcript = openai.Audio.transcribe(
         file=input_file, model="whisper-1", response_format="text", language="zh"
     )
@@ -36,7 +38,7 @@ for file in os.listdir(input_path):
     output_file.write(transcript)
     output_file.close()
 
-    print(f'Successfully transcribe "{file_name}"')
+    print(f'Successfully transcribed: {file_name} !')
 
 # output_file.write(transcript)
 # output_file.close()
